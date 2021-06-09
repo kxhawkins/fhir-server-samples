@@ -52,7 +52,10 @@ param
     [bool]$EnableExport = $false,
 
     [parameter(Mandatory = $false)]
-    [SecureString]$AdminPassword
+    [SecureString]$AdminPassword,
+
+    [parameter(Mandatory = $false)]
+    [string]$KeyVaultName = "$EnvironmentName-ts"
 
 )
 
@@ -148,7 +151,7 @@ else {
 
 
 # Set up Auth Configuration and Resource Group
-./Create-FhirServerSamplesAuthConfig.ps1 -EnvironmentName $EnvironmentName -EnvironmentLocation $EnvironmentLocation -AdminPassword $AdminPassword -UsePaaS $UsePaaS
+./Create-FhirServerSamplesAuthConfig.ps1 -EnvironmentName $EnvironmentName -EnvironmentLocation $EnvironmentLocation -KeyVaultName $KeyVaultName -AdminPassword $AdminPassword -UsePaaS $UsePaaS
 
 #Template URLs
 $fhirServerTemplateUrl = "https://raw.githubusercontent.com/microsoft/fhir-server/master/samples/templates/default-azuredeploy.json"
@@ -173,29 +176,29 @@ if ($UsePaaS) {
     $fhirServerUrl = "https://${EnvironmentName}srvr.azurewebsites.net"
 }
 
-$confidentialClientIdKV = (Get-AzKeyVaultSecret -VaultName "${EnvironmentName}-ts" -Name "${EnvironmentName}-confidential-client-id")
+$confidentialClientIdKV = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${EnvironmentName}-confidential-client-id")
 $confidentialClientId = SecretValueText -secret $confidentialClientIdKV.SecretValue
 
-$confidentialClientSecretKV = (Get-AzKeyVaultSecret -VaultName "${EnvironmentName}-ts" -Name "${EnvironmentName}-confidential-client-secret")
+$confidentialClientSecretKV = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${EnvironmentName}-confidential-client-secret")
 $confidentialClientSecret = SecretValueText -secret $confidentialClientSecretKV.SecretValue
 
-$serviceClientIdKV = (Get-AzKeyVaultSecret -VaultName "${EnvironmentName}-ts" -Name "${EnvironmentName}-service-client-id")
+$serviceClientIdKV = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${EnvironmentName}-service-client-id")
 $serviceClientId = SecretValueText -secret $serviceClientIdKV.SecretValue
 
-$serviceClientSecretKV = (Get-AzKeyVaultSecret -VaultName "${EnvironmentName}-ts" -Name "${EnvironmentName}-service-client-secret")
+$serviceClientSecretKV = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${EnvironmentName}-service-client-secret")
 $serviceClientSecret = SecretValueText -secret $serviceClientSecretKV.SecretValue
 
 $serviceClientObjectId = (Get-AzureADServicePrincipal -Filter "AppId eq '$serviceClientId'").ObjectId
 
-$dashboardUserUpnKV  = (Get-AzKeyVaultSecret -VaultName "${EnvironmentName}-ts" -Name "${EnvironmentName}-admin-upn")
+$dashboardUserUpnKV  = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${EnvironmentName}-admin-upn")
 $dashboardUserUpn = SecretValueText -secret $dashboardUserUpnKV.SecretValue
 
 $dashboardUserOid = (Get-AzureADUser -Filter "UserPrincipalName eq '$dashboardUserUpn'").ObjectId
 
-$dashboardUserPasswordKV  = (Get-AzKeyVaultSecret -VaultName "${EnvironmentName}-ts" -Name "${EnvironmentName}-admin-password")
+$dashboardUserPasswordKV  = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${EnvironmentName}-admin-password")
 $dashboardUserPassword = SecretValueText -secret $dashboardUserPasswordKV.SecretValue
 
-$publicClientIdKV = (Get-AzKeyVaultSecret -VaultName "${EnvironmentName}-ts" -Name "${EnvironmentName}-public-client-id")
+$publicClientIdKV = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name "${EnvironmentName}-public-client-id")
 $publicClientId = SecretValueText -secret $publicClientIdKV.SecretValue
 
 
