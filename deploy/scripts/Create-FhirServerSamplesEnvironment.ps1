@@ -154,16 +154,17 @@ else {
 ./Create-FhirServerSamplesAuthConfig.ps1 -EnvironmentName $EnvironmentName -EnvironmentLocation $EnvironmentLocation -KeyVaultName $KeyVaultName -AdminPassword $AdminPassword -UsePaaS $UsePaaS
 
 #Template URLs
+$githubRawBaseUrl = $SourceRepository.Replace("github.com","raw.githubusercontent.com").TrimEnd('/')
+
+$sandboxTemplate = "${githubRawBaseUrl}/${SourceRevision}/deploy/templates/azuredeploy-sandbox.json"
+$dashboardJSTemplate = "${githubRawBaseUrl}/${SourceRevision}/deploy/templates/azuredeploy-fhirdashboard-js.json"
+$importerTemplate = "${githubRawBaseUrl}/${SourceRevision}/deploy/templates/azuredeploy-importer.json"
+
 $fhirServerTemplateUrl = "https://raw.githubusercontent.com/microsoft/fhir-server/master/samples/templates/default-azuredeploy.json"
 if ($PersistenceProvider -eq 'sql')
 {
     $fhirServerTemplateUrl = "https://raw.githubusercontent.com/microsoft/fhir-server/master/samples/templates/default-azuredeploy-sql.json"
 }
-
-$githubRawBaseUrl = $SourceRepository.Replace("github.com","raw.githubusercontent.com").TrimEnd('/')
-$sandboxTemplate = "${githubRawBaseUrl}/${SourceRevision}/deploy/templates/azuredeploy-sandbox.json"
-$dashboardJSTemplate = "${githubRawBaseUrl}/${SourceRevision}/deploy/templates/azuredeploy-fhirdashboard-js.json"
-$importerTemplate = "${githubRawBaseUrl}/${SourceRevision}/deploy/templates/azuredeploy-importer.json"
 
 $tenantDomain = $tenantInfo.TenantDomain
 $aadAuthority = "https://login.microsoftonline.com/${tenantDomain}"
